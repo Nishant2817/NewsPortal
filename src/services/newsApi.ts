@@ -76,9 +76,11 @@ export async function fetchArticles(limit: number = 10, category?: string, count
   // 2. Try NewsAPI (Works on Localhost, fails on Vercel Free)
   if (NEWS_API_KEY) {
     try {
+      // Use 'everything' endpoint with a query for more reliable results for 'in' (India) on free plans.
+      const query = country === 'in' ? 'india' : country;
       const endpoint = category
-        ? `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&pageSize=${limit}&apiKey=${NEWS_API_KEY}`
-        : `https://newsapi.org/v2/top-headlines?country=${country}&pageSize=${limit}&apiKey=${NEWS_API_KEY}`;
+        ? `https://newsapi.org/v2/everything?q=${query}+${category}&sortBy=publishedAt&pageSize=${limit}&apiKey=${NEWS_API_KEY}`
+        : `https://newsapi.org/v2/everything?q=${query}&sortBy=publishedAt&pageSize=${limit}&apiKey=${NEWS_API_KEY}`;
 
       const res = await fetch(endpoint, { next: { revalidate: 3600 } });
       if (res.ok) {
